@@ -1,0 +1,134 @@
+# ==============================================================================
+# Warehouse Robot RL - Master Configuration File
+# ==============================================================================
+# All hyperparameters and environment settings are centralized here.
+# Do NOT hard-code these values in source files.
+
+# ------------------------------------------------------------------------------
+# Environment Settings
+# ------------------------------------------------------------------------------
+environment:
+  grid_size: 10            # Default grid size (NxN). Options: 8, 10, 15, 20
+  obstacle_density: 0.2    # Fraction of free cells that become obstacles [0.0, 0.5]
+  random_seed: 42          # Master random seed for reproducibility
+  max_steps: 200           # Maximum steps per episode before truncation
+  state_type: "advanced"   # "basic" (4 dims) or "advanced" (8 dims with local obstacles)
+
+  # Grid cell codes (internal representation)
+  cell_free: 0
+  cell_obstacle: 1
+  cell_robot: 2
+  cell_goal: 3
+
+# ------------------------------------------------------------------------------
+# Reward Engineering
+# Documentation: Each value is chosen to shape agent behavior:
+#   - goal_reached: Large positive reward to incentivize reaching the target
+#   - step_penalty: Small penalty per step to encourage shortest paths
+#   - closer_reward: Positive shaping to encourage moving toward goal
+#   - farther_penalty: Negative shaping to discourage moving away from goal
+#   - collision_penalty: Large negative to discourage bumping into obstacles
+#   - boundary_penalty: Same magnitude as obstacle, treat boundary as obstacle
+#   - timeout_penalty: Applied when max_steps exceeded, discourage wandering
+# ------------------------------------------------------------------------------
+rewards:
+  goal_reached: 100.0
+  step_penalty: -1.0
+  closer_reward: 2.0
+  farther_penalty: -2.0
+  collision_penalty: -20.0
+  boundary_penalty: -20.0
+  timeout_penalty: -10.0
+
+# ------------------------------------------------------------------------------
+# Q-Learning Hyperparameters
+# ------------------------------------------------------------------------------
+q_learning:
+  learning_rate: 0.1       # alpha: step size for Q-value updates
+  discount_factor: 0.99    # gamma: importance of future rewards
+  epsilon_start: 1.0       # Initial exploration rate
+  epsilon_end: 0.01        # Minimum exploration rate
+  epsilon_decay: 0.995     # Multiplicative decay applied each episode
+  episodes: 3000           # Total training episodes
+  eval_interval: 100       # Log metrics every N episodes
+
+# ------------------------------------------------------------------------------
+# DQN Hyperparameters
+# ------------------------------------------------------------------------------
+dqn:
+  learning_rate: 0.001     # Adam optimizer learning rate
+  discount_factor: 0.99    # gamma
+  epsilon_start: 1.0       # Initial epsilon for exploration
+  epsilon_end: 0.01        # Minimum epsilon
+  epsilon_decay: 0.995     # Decay per episode
+  episodes: 2000           # Total training episodes
+  batch_size: 64           # Mini-batch size for experience replay
+  replay_buffer_size: 10000 # Maximum transitions stored
+  target_update_freq: 10   # Episodes between target network syncs
+  hidden_size: 128         # Neurons in each hidden layer
+  eval_interval: 100       # Log metrics every N episodes
+  gradient_clip: 1.0       # Max gradient norm for stability
+
+# ------------------------------------------------------------------------------
+# Training Settings
+# ------------------------------------------------------------------------------
+training:
+  save_dir: "results"
+  model_dir: "models"
+  checkpoint_interval: 500   # Save model checkpoint every N episodes
+  moving_avg_window: 50      # Window for smoothed reward curve
+
+# ------------------------------------------------------------------------------
+# Evaluation Settings
+# ------------------------------------------------------------------------------
+evaluation:
+  num_episodes: 100          # Episodes per evaluation run
+  deterministic: true        # Disable exploration during evaluation
+  test_seeds: [100, 200, 300, 400, 500]  # Seeds for unseen layouts
+
+  # Obstacle density scenarios to evaluate
+  scenarios:
+    low:
+      obstacle_density: 0.1
+      num_episodes: 50
+    medium:
+      obstacle_density: 0.2
+      num_episodes: 50
+    high:
+      obstacle_density: 0.35
+      num_episodes: 50
+
+# ------------------------------------------------------------------------------
+# Baseline Algorithms
+# ------------------------------------------------------------------------------
+baselines:
+  random_agent:
+    num_episodes: 100
+  bfs:
+    num_episodes: 100
+  astar:
+    num_episodes: 100
+    heuristic: "manhattan"   # Options: "manhattan", "euclidean"
+
+# ------------------------------------------------------------------------------
+# Visualization Settings
+# ------------------------------------------------------------------------------
+visualization:
+  cell_size: 60              # Pixel size of each grid cell
+  animation_delay: 0.1       # Seconds between animation frames
+  colors:
+    free: "#F0F4F8"
+    obstacle: "#2D3748"
+    robot: "#3182CE"
+    goal: "#38A169"
+    visited: "#BEE3F8"
+    path: "#ECC94B"
+    start: "#9F7AEA"
+
+# ------------------------------------------------------------------------------
+# Logging
+# ------------------------------------------------------------------------------
+logging:
+  level: "INFO"              # DEBUG, INFO, WARNING, ERROR
+  log_to_file: true
+  log_dir: "results/logs"

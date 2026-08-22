@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Project outputs (large files — generate locally)
+models/*.pkl
+models/*.pt
+results/q_learning/*/
+results/dqn/*/
+results/tmp_*.pkl
+results/tmp_*.pt
+
+# Keep directory structure
+!models/.gitkeep
+!results/.gitkeep
+!results/q_learning/.gitkeep
+!results/dqn/.gitkeep
+!notebooks/.gitkeep
+
+# Logs
+*.log
+results/logs/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
